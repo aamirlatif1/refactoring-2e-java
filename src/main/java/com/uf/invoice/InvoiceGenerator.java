@@ -26,6 +26,10 @@ public class InvoiceGenerator {
         }
 
         public String invoke() {
+            return renderPlainText();
+        }
+
+        private String renderPlainText() {
             var result = format("Statement for %s\n", invoice.customer);
             for (Performance perf : invoice.performances) {
                 // print line for this order
