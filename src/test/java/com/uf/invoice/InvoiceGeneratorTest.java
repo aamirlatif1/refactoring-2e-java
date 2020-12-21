@@ -3,14 +3,14 @@ package com.uf.invoice;
 import com.uf.data.Invoice;
 import com.uf.data.Performance;
 import com.uf.data.Play;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class InvoiceGeneratorTest {
 

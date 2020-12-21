@@ -29,29 +29,28 @@ public class InvoiceGenerator {
             this.plays = plays;
         }
 
-
         public String renderPlainText() {
-            var result = format("Statement for %s\n", invoice.customer);
+            StringBuilder result = new StringBuilder(format("Statement for %s\n", invoice.customer));
             for (Performance perf : invoice.performances) {
-                result += format(" %s: %s (%d seats)\n", playFor(perf).name, usd(amountFor(perf)), perf.audience);
+                result.append(format(" %s: %s (%d seats)\n", playFor(perf).name, usd(amountFor(perf)), perf.audience));
             }
-            result += format("Amount owed is %s\n", usd(totalAmount()));
-            result += format("You earned %d credits\n", totalVolumeCredits());
-            return result;
+            result.append(format("Amount owed is %s\n", usd(totalAmount())));
+            result.append(format("You earned %d credits\n", totalVolumeCredits()));
+            return result.toString();
         }
 
         public String renderHtml() {
-            var result = format("<h1>Statement for %s</h1>\n", invoice.customer);
-            result += "<table>\n";
-            result += "<tr><th>play</th><th>seats</th><th>cost</th></tr>";
+            StringBuilder result = new StringBuilder(format("<h1>Statement for %s</h1>\n", invoice.customer));
+            result.append("<table>\n");
+            result.append("<tr><th>play</th><th>seats</th><th>cost</th></tr>");
             for (Performance perf : invoice.performances) {
-                result += format(" <tr><td>%s</td><td>%s</td>", playFor(perf).name, perf.audience);
-                result += format("<td>%s</td></tr>\n", usd(amountFor(perf)));
+                result.append(format(" <tr><td>%s</td><td>%s</td>", playFor(perf).name, perf.audience));
+                result.append(format("<td>%s</td></tr>\n", usd(amountFor(perf))));
             }
-            result += "</table>\n";
-            result += format("<p>Amount owed is <em>%s</em></p>\n", usd(totalAmount()));
-            result += format("<p>You earned <em>%d</em> credits</p>\n", totalVolumeCredits());
-            return result;
+            result.append("</table>\n");
+            result.append(format("<p>Amount owed is <em>%s</em></p>\n", usd(totalAmount())));
+            result.append(format("<p>You earned <em>%d</em> credits</p>\n", totalVolumeCredits()));
+            return result.toString();
         }
 
         private double totalAmount() {
@@ -71,7 +70,8 @@ public class InvoiceGenerator {
         }
 
         private String usd(double amount) {
-            return NumberFormat.getCurrencyInstance(Locale.US).format(amount / 100.0);
+            return NumberFormat.getCurrencyInstance(Locale.US)
+                    .format(amount / 100.0);
         }
 
         private int volumeCreditsFor(Performance aPerformance) {
