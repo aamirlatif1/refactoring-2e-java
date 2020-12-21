@@ -38,7 +38,7 @@ class InvoiceGeneratorTest {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> generator.plainStatement(invoice, plays));
 
         //Then
-        Assertions.assertEquals("unknown type: sci-fi", exception.getMessage());
+        assertEquals("unknown type: sci-fi", exception.getMessage());
     }
 
     @Test
@@ -58,7 +58,7 @@ class InvoiceGeneratorTest {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> generator.plainStatement(invoice, plays));
 
         //Then
-        Assertions.assertEquals("unknown type: hamlet2", exception.getMessage());
+        assertEquals("unknown type: hamlet2", exception.getMessage());
     }
 
     @Test
@@ -86,7 +86,7 @@ class InvoiceGeneratorTest {
                         "Amount owed is $1,730.00\n" +
                         "You earned 47 credits\n";
 
-        Assertions.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -105,8 +105,6 @@ class InvoiceGeneratorTest {
         //When
         String actual = generator.htmlStatement(invoice, plays);
 
-        System.out.println(actual);
-
         //Then
         String expected =
                 "<h1>Statement for BigCo</h1>\n" +
@@ -118,7 +116,7 @@ class InvoiceGeneratorTest {
                         "<p>Amount owed is <em>$1,730.00</em></p>\n" +
                         "<p>You earned <em>47</em> credits</p>\n";
 
-        Assertions.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
 }
