@@ -5,19 +5,33 @@ import com.uf.data.Performance;
 import com.uf.data.Play;
 
 import java.text.NumberFormat;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
 
 public class InvoiceGenerator {
 
     public String plainStatement(final Invoice invoice, final Map<String, Play> plays) {
-        return new Statement(invoice, plays).renderPlainText();
+        return new Statement(invoice, plays).plainStatement();
     }
 
     public String htmlStatement(final Invoice invoice, final Map<String, Play> plays) {
-        return new Statement(invoice, plays).renderHtml();
+        return new Statement(invoice, plays).htmlStatement();
+    }
+
+    private static class StatementData {
+        private String customer;
+        private double totalAmount;
+        private int totalVolumeCredits;
+        private List<PerformanceExt> performances;
+    }
+
+    private static class PerformanceExt extends Performance {
+         private Play play;
+         private double amount;
     }
 
     private static class Statement {
@@ -29,34 +43,61 @@ public class InvoiceGenerator {
             this.plays = plays;
         }
 
-        public String renderPlainText() {
-            StringBuilder result = new StringBuilder(format("Statement for %s\n", invoice.customer));
-            for (Performance perf : invoice.performances) {
-                result.append(format(" %s: %s (%d seats)\n", playFor(perf).name, usd(amountFor(perf)), perf.audience));
+        public String plainStatement() {
+            return renderPlainText(getStatementData());
+        }
+
+
+        private StatementData getStatementData() {
+            StatementData data = new StatementData();
+            data.performances = invoice.performances.stream().map(this::enrich).collect(toList());
+            data.customer = invoice.customer;
+            data.totalAmount = totalAmount(data);
+            data.totalVolumeCredits = totalVolumeCredits();
+            return data;
+        }
+
+        private PerformanceExt enrich(Performance perf){
+            PerformanceExt ext = new PerformanceExt();
+            ext.playID = perf.playID;
+            ext.audience = perf.audience;
+            ext.play = playFor(perf);
+            ext.amount = amountFor(perf);
+            return ext;
+        }
+
+        public String htmlStatement() {
+            return renderHtml(getStatementData());
+        }
+
+        private String renderPlainText(StatementData data) {
+            StringBuilder result = new StringBuilder(format("Statement for %s\n", data.customer));
+            for (PerformanceExt perf : data.performances) {
+                result.append(format(" %s: %s (%d seats)\n", perf.play.name, usd(perf.amount), perf.audience));
             }
-            result.append(format("Amount owed is %s\n", usd(totalAmount())));
-            result.append(format("You earned %d credits\n", totalVolumeCredits()));
+            result.append(format("Amount owed is %s\n", usd(data.totalAmount)));
+            result.append(format("You earned %d credits\n", data.totalVolumeCredits));
             return result.toString();
         }
 
-        public String renderHtml() {
-            StringBuilder result = new StringBuilder(format("<h1>Statement for %s</h1>\n", invoice.customer));
+        private String renderHtml(StatementData data) {
+            StringBuilder result = new StringBuilder(format("<h1>Statement for %s</h1>\n", data.customer));
             result.append("<table>\n");
             result.append("<tr><th>play</th><th>seats</th><th>cost</th></tr>");
-            for (Performance perf : invoice.performances) {
-                result.append(format(" <tr><td>%s</td><td>%s</td>", playFor(perf).name, perf.audience));
-                result.append(format("<td>%s</td></tr>\n", usd(amountFor(perf))));
+            for (PerformanceExt perf : data.performances) {
+                result.append(format(" <tr><td>%s</td><td>%s</td>", perf.play.name, perf.audience));
+                result.append(format("<td>%s</td></tr>\n", usd(perf.amount)));
             }
             result.append("</table>\n");
-            result.append(format("<p>Amount owed is <em>%s</em></p>\n", usd(totalAmount())));
-            result.append(format("<p>You earned <em>%d</em> credits</p>\n", totalVolumeCredits()));
+            result.append(format("<p>Amount owed is <em>%s</em></p>\n", usd(data.totalAmount)));
+            result.append(format("<p>You earned <em>%d</em> credits</p>\n", data.totalVolumeCredits));
             return result.toString();
         }
 
-        private double totalAmount() {
+        private double totalAmount(StatementData data) {
             var result = 0.0;
-            for (Performance perf : invoice.performances) {
-                result += amountFor(perf);
+            for (PerformanceExt perf : data.performances) {
+                result += perf.amount;
             }
             return result;
         }
