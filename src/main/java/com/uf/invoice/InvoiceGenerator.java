@@ -36,7 +36,7 @@ public class InvoiceGenerator {
                     throw new IllegalArgumentException("unknown type: " + perf.playID);
                 final var play = plays.get(perf.playID);
 
-                double thisAmount = amountFor(perf, play);
+                var thisAmount = amountFor(perf, play);
 
                 // add volume credits
                 volumeCredits += Math.max(perf.audience - 30, 0);
@@ -54,26 +54,26 @@ public class InvoiceGenerator {
             return result;
         }
 
-        private double amountFor(Performance perf, Play play) {
-            var thisAmount = 0.0;
+        private double amountFor(Performance aPerformance, Play play) {
+            var result = 0.0;
             switch (play.type) {
                 case "tragedy":
-                    thisAmount = 40000.0;
-                    if (perf.audience > 30) {
-                        thisAmount += 1000 * (perf.audience - 30);
+                    result = 40000.0;
+                    if (aPerformance.audience > 30) {
+                        result += 1000 * (aPerformance.audience - 30);
                     }
                     break;
                 case "comedy":
-                    thisAmount = 30000.0;
-                    if (perf.audience > 20) {
-                        thisAmount += 10000 + 500 * (perf.audience - 20);
+                    result = 30000.0;
+                    if (aPerformance.audience > 20) {
+                        result += 10000 + 500 * (aPerformance.audience - 20);
                     }
-                    thisAmount += 300 * perf.audience;
+                    result += 300 * aPerformance.audience;
                     break;
                 default:
                     throw new IllegalArgumentException("unknown type: " + play.type);
             }
-            return thisAmount;
+            return result;
         }
     }
 }
