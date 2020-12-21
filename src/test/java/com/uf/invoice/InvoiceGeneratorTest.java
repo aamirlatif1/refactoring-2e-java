@@ -35,7 +35,7 @@ class InvoiceGeneratorTest {
         );
 
         //When
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> generator. statement(invoice, plays));
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> generator.plainStatement(invoice, plays));
 
         //Then
         Assertions.assertEquals("unknown type: sci-fi", exception.getMessage());
@@ -55,7 +55,7 @@ class InvoiceGeneratorTest {
         );
 
         //When
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> generator. statement(invoice, plays));
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> generator.plainStatement(invoice, plays));
 
         //Then
         Assertions.assertEquals("unknown type: hamlet2", exception.getMessage());
@@ -75,7 +75,7 @@ class InvoiceGeneratorTest {
         );
 
         //When
-        String actual = generator.statement(invoice, plays);
+        String actual = generator.plainStatement(invoice, plays);
 
         //Then
         String expected =

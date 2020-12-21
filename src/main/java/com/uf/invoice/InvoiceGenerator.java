@@ -12,37 +12,45 @@ import static java.lang.String.format;
 
 public class InvoiceGenerator {
 
-    public String statement(final Invoice invoice, final Map<String, Play> plays) {
-        return new Generator(invoice, plays).invoke();
+    public String plainStatement(final Invoice invoice, final Map<String, Play> plays) {
+        return new Statement(invoice, plays).renderPlainText();
     }
 
-    private static class StatementData{
-        String customer;
+    public String htmlStatement(final Invoice invoice, final Map<String, Play> plays) {
+        return new Statement(invoice, plays).renderHtml();
     }
 
-    private static class Generator {
+    private static class Statement {
         private Invoice invoice;
         private Map<String, Play> plays;
 
-        public Generator(Invoice invoice, Map<String, Play> plays) {
+        public Statement(Invoice invoice, Map<String, Play> plays) {
             this.invoice = invoice;
             this.plays = plays;
         }
 
-        public String invoke() {
-            StatementData data = new StatementData();
-            data.customer = invoice.customer;
-            return renderPlainText(data);
-        }
 
-        private String renderPlainText(StatementData data) {
-            var result = format("Statement for %s\n", data.customer);
+        public String renderPlainText() {
+            var result = format("Statement for %s\n", invoice.customer);
             for (Performance perf : invoice.performances) {
-                // print line for this order
                 result += format(" %s: %s (%d seats)\n", playFor(perf).name, usd(amountFor(perf)), perf.audience);
             }
             result += format("Amount owed is %s\n", usd(totalAmount()));
             result += format("You earned %d credits\n", totalVolumeCredits());
+            return result;
+        }
+
+        public String renderHtml() {
+            var result = format("<h1>Statement for %s</h1>\n", invoice.customer);
+            result += "<table>\n";
+            result += "<tr><th>play</th><th>seats</th><th>cost</th></tr>";
+            for (Performance perf : invoice.performances) {
+                result += format(" <tr><td>%s</td><td>%s</td>", playFor(perf).name, perf.audience);
+                result += format("<td>%s</td></tr>\n", usd(amountFor(perf)));
+            }
+            result += "</table>\n";
+            result += format("<p>Amount owed is <em>%s</em></p>\n", usd(totalAmount()));
+            result += format("<p>You earned <em>%d</em> credits</p>\n", totalVolumeCredits());
             return result;
         }
 
