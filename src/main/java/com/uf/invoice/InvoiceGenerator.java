@@ -26,7 +26,7 @@ public class InvoiceGenerator {
         }
 
         public String invoke() {
-            var totalAmount = 0.0;
+
 
             var result = format("Statement for %s\n", invoice.customer);
             final var currency = NumberFormat.getCurrencyInstance(Locale.US);
@@ -36,27 +36,29 @@ public class InvoiceGenerator {
                     throw new IllegalArgumentException("unknown type: " + perf.playID);
                 }
 
-                // add volume credits
-
-
-                double amount = amountFor(perf);
-
                 // print line for this order
-                result += format(" %s: %s (%d seats)\n", playFor(perf).name, usd(amount), perf.audience);
-                totalAmount += amountFor(perf);
+                result += format(" %s: %s (%d seats)\n", playFor(perf).name, usd(amountFor(perf)), perf.audience);
             }
 
-            result += format("Amount owed is %s\n", usd(totalAmount));
+            result += format("Amount owed is %s\n", usd(totalAmount()));
             result += format("You earned %d credits\n", totalVolumeCredits());
             return result;
         }
 
-        private int totalVolumeCredits() {
-            var volumeCredits = 0;
+        private double totalAmount() {
+            var result = 0.0;
             for (Performance perf : invoice.performances) {
-                volumeCredits += volumeCreditsFor(perf);
+                result += amountFor(perf);
             }
-            return volumeCredits;
+            return result;
+        }
+
+        private int totalVolumeCredits() {
+            var result = 0;
+            for (Performance perf : invoice.performances) {
+                result += volumeCreditsFor(perf);
+            }
+            return result;
         }
 
         private String usd(double amount) {
