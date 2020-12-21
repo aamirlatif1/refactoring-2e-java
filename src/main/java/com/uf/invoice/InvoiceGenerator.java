@@ -27,7 +27,7 @@ public class InvoiceGenerator {
 
         public String invoke() {
             var totalAmount = 0.0;
-            var volumeCredits = 0;
+
             var result = format("Statement for %s\n", invoice.customer);
             final var currency = NumberFormat.getCurrencyInstance(Locale.US);
 
@@ -37,13 +37,18 @@ public class InvoiceGenerator {
                 }
 
                 // add volume credits
-                volumeCredits += volumeCreditsFor(perf);
+
 
                 double amount = amountFor(perf);
 
                 // print line for this order
                 result += format(" %s: %s (%d seats)\n", playFor(perf).name, usd(amount), perf.audience);
                 totalAmount += amountFor(perf);
+            }
+
+            var volumeCredits = 0;
+            for (Performance perf : invoice.performances) {
+                volumeCredits += volumeCreditsFor(perf);
             }
 
             result += format("Amount owed is %s\n", usd(totalAmount));
