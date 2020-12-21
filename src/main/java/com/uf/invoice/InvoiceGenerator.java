@@ -32,28 +32,35 @@ public class InvoiceGenerator {
             final var currency = NumberFormat.getCurrencyInstance(Locale.US);
 
             for (Performance perf : invoice.performances) {
-                if (!plays.containsKey(perf.playID))
+                if (!plays.containsKey(perf.playID)) {
                     throw new IllegalArgumentException("unknown type: " + perf.playID);
+                }
 
                 // add volume credits
                 volumeCredits += volumeCreditsFor(perf);
 
+                double amount = amountFor(perf);
+
                 // print line for this order
-                result += format(" %s: %s (%d seats)\n", playFor(perf).name, currency.format(amountFor(perf) / 100.0), perf.audience);
+                result += format(" %s: %s (%d seats)\n", playFor(perf).name, usd(amount), perf.audience);
                 totalAmount += amountFor(perf);
             }
 
-            result += format("Amount owed is %s\n", currency.format(totalAmount / 100.0));
+            result += format("Amount owed is %s\n", usd(totalAmount));
             result += format("You earned %d credits\n", volumeCredits);
             return result;
         }
 
+        private String usd(double amount) {
+            return NumberFormat.getCurrencyInstance(Locale.US).format(amount / 100.0);
+        }
+
         private int volumeCreditsFor(Performance aPerformance) {
-            var volumeCredits = 0;
-            volumeCredits += Math.max(aPerformance.audience - 30, 0);
+            var result = 0;
+            result += Math.max(aPerformance.audience - 30, 0);
             if ("comedy".equals(playFor(aPerformance).type))
-                volumeCredits += aPerformance.audience / 5;
-            return volumeCredits;
+                result += aPerformance.audience / 5;
+            return result;
         }
 
         private Play playFor(Performance aPerformance) {
