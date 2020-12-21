@@ -46,14 +46,17 @@ public class InvoiceGenerator {
                 totalAmount += amountFor(perf);
             }
 
+            result += format("Amount owed is %s\n", usd(totalAmount));
+            result += format("You earned %d credits\n", totalVolumeCredits());
+            return result;
+        }
+
+        private int totalVolumeCredits() {
             var volumeCredits = 0;
             for (Performance perf : invoice.performances) {
                 volumeCredits += volumeCreditsFor(perf);
             }
-
-            result += format("Amount owed is %s\n", usd(totalAmount));
-            result += format("You earned %d credits\n", volumeCredits);
-            return result;
+            return volumeCredits;
         }
 
         private String usd(double amount) {
