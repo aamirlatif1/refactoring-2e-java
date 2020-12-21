@@ -34,24 +34,27 @@ public class InvoiceGenerator {
             for (Performance perf : invoice.performances) {
                 if (!plays.containsKey(perf.playID))
                     throw new IllegalArgumentException("unknown type: " + perf.playID);
-                final var play = plays.get(perf.playID);
 
-                var thisAmount = amountFor(perf, play);
+                var thisAmount = amountFor(perf, playFor(perf));
 
                 // add volume credits
                 volumeCredits += Math.max(perf.audience - 30, 0);
                 // add extra credit for every ten comedy attendees
-                if ("comedy".equals(play.type))
+                if ("comedy".equals(playFor(perf).type))
                     volumeCredits += perf.audience / 5;
 
                 // print line for this order
-                result += format(" %s: %s (%d seats)\n", play.name, currency.format(thisAmount / 100.0), perf.audience);
+                result += format(" %s: %s (%d seats)\n", playFor(perf).name, currency.format(thisAmount / 100.0), perf.audience);
                 totalAmount += thisAmount;
             }
 
             result += format("Amount owed is %s\n", currency.format(totalAmount / 100.0));
             result += format("You earned %d credits\n", volumeCredits);
             return result;
+        }
+
+        private Play playFor(Performance aPerformance) {
+            return plays.get(aPerformance.playID);
         }
 
         private double amountFor(Performance aPerformance, Play play) {
