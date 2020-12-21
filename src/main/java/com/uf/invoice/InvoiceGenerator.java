@@ -16,7 +16,11 @@ public class InvoiceGenerator {
         return new Generator(invoice, plays).invoke();
     }
 
-    private class Generator {
+    private static class StatementData{
+        String customer;
+    }
+
+    private static class Generator {
         private Invoice invoice;
         private Map<String, Play> plays;
 
@@ -26,11 +30,13 @@ public class InvoiceGenerator {
         }
 
         public String invoke() {
-            return renderPlainText();
+            StatementData data = new StatementData();
+            data.customer = invoice.customer;
+            return renderPlainText(data);
         }
 
-        private String renderPlainText() {
-            var result = format("Statement for %s\n", invoice.customer);
+        private String renderPlainText(StatementData data) {
+            var result = format("Statement for %s\n", data.customer);
             for (Performance perf : invoice.performances) {
                 // print line for this order
                 result += format(" %s: %s (%d seats)\n", playFor(perf).name, usd(amountFor(perf)), perf.audience);
