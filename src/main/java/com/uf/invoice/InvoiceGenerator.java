@@ -26,20 +26,11 @@ public class InvoiceGenerator {
         }
 
         public String invoke() {
-
-
             var result = format("Statement for %s\n", invoice.customer);
-            final var currency = NumberFormat.getCurrencyInstance(Locale.US);
-
             for (Performance perf : invoice.performances) {
-                if (!plays.containsKey(perf.playID)) {
-                    throw new IllegalArgumentException("unknown type: " + perf.playID);
-                }
-
                 // print line for this order
                 result += format(" %s: %s (%d seats)\n", playFor(perf).name, usd(amountFor(perf)), perf.audience);
             }
-
             result += format("Amount owed is %s\n", usd(totalAmount()));
             result += format("You earned %d credits\n", totalVolumeCredits());
             return result;
@@ -74,6 +65,9 @@ public class InvoiceGenerator {
         }
 
         private Play playFor(Performance aPerformance) {
+            if (!plays.containsKey(aPerformance.playID)) {
+                throw new IllegalArgumentException("unknown type: " + aPerformance.playID);
+            }
             return plays.get(aPerformance.playID);
         }
 
