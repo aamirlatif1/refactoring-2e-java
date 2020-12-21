@@ -50,14 +50,17 @@ public class InvoiceGenerator {
 
         private StatementData getStatementData() {
             StatementData data = new StatementData();
-            data.performances = invoice.performances.stream().map(this::enrich).collect(toList());
+            data.performances = invoice.performances.stream()
+                    .map(this::enrichPerformance)
+                    .collect(toList());
+
             data.customer = invoice.customer;
             data.totalAmount = totalAmount(data);
             data.totalVolumeCredits = totalVolumeCredits();
             return data;
         }
 
-        private PerformanceExt enrich(Performance perf){
+        private PerformanceExt enrichPerformance(Performance perf){
             PerformanceExt ext = new PerformanceExt();
             ext.playID = perf.playID;
             ext.audience = perf.audience;
