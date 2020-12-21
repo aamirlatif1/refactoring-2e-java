@@ -36,24 +36,7 @@ public class InvoiceGenerator {
                     throw new IllegalArgumentException("unknown type: " + perf.playID);
                 final var play = plays.get(perf.playID);
 
-                var thisAmount = 0.0;
-                switch (play.type) {
-                    case "tragedy":
-                        thisAmount = 40000.0;
-                        if (perf.audience > 30) {
-                            thisAmount += 1000 * (perf.audience - 30);
-                        }
-                        break;
-                    case "comedy":
-                        thisAmount = 30000.0;
-                        if (perf.audience > 20) {
-                            thisAmount += 10000 + 500 * (perf.audience - 20);
-                        }
-                        thisAmount += 300 * perf.audience;
-                        break;
-                    default:
-                        throw new IllegalArgumentException("unknown type: " + play.type);
-                }
+                double thisAmount = amountFor(perf, play);
 
                 // add volume credits
                 volumeCredits += Math.max(perf.audience - 30, 0);
@@ -69,6 +52,28 @@ public class InvoiceGenerator {
             result += format("Amount owed is %s\n", currency.format(totalAmount / 100.0));
             result += format("You earned %d credits\n", volumeCredits);
             return result;
+        }
+
+        private double amountFor(Performance perf, Play play) {
+            var thisAmount = 0.0;
+            switch (play.type) {
+                case "tragedy":
+                    thisAmount = 40000.0;
+                    if (perf.audience > 30) {
+                        thisAmount += 1000 * (perf.audience - 30);
+                    }
+                    break;
+                case "comedy":
+                    thisAmount = 30000.0;
+                    if (perf.audience > 20) {
+                        thisAmount += 10000 + 500 * (perf.audience - 20);
+                    }
+                    thisAmount += 300 * perf.audience;
+                    break;
+                default:
+                    throw new IllegalArgumentException("unknown type: " + play.type);
+            }
+            return thisAmount;
         }
     }
 }
