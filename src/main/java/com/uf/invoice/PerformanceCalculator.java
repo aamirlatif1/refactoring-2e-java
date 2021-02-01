@@ -3,7 +3,7 @@ package com.uf.invoice;
 import com.uf.data.Performance;
 import com.uf.data.Play;
 
-public class PerformanceCalculator {
+public abstract class PerformanceCalculator {
     public Performance performance;
     public Play play;
 
@@ -21,9 +21,7 @@ public class PerformanceCalculator {
         }
     }
 
-    public double amount() {
-        throw new IllegalArgumentException("subclass responsibility");
-    }
+    public abstract double amount();
 
     public int volumeCredits() {
         return Math.max(performance.audience - 30, 0);
